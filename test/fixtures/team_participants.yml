@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  team: one
+  participant: one
+  is_lead: false
+
+two:
+  team: two
+  participant: two
+  is_lead: false
