@@ -10,18 +10,24 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
-    render json: @user
+    if @user
+      render json: @user,only: :username, include: {participants:{include: {},only:[:player_name, :course, :stream, :year_of_passing]},teams:{include: [ program: {only: :title}, participants:{only: :user, include: {user: {only: :username}}}], only:[:name, :id, :data] }, user_detail:{only: [:id,:firstname, :lastname, :phone1, :email, :image]}},
+             status: :ok
+    else
+      render json:  "Incorrect Password", status: :unprocessable_entity
+    end
   end
 
   def login_auth
     @user = User.find_by(username: params[:username]).authenticate(params[:password])
     #print(@user.authenticate(params[:password]))
     if @user
-      render json: @user, include: {teams:{include: { program: {only: :title} }}}, status: :ok
+      render json: @user, status: :ok
     else
       render json:  "Incorrect Password", status: :unprocessable_entity
     end
   end
+
 
 
   def login_phone_auth
@@ -29,6 +35,16 @@ class UsersController < ApplicationController
 
     if @user
       render json: @user, status: :ok
+    else
+      render json:  "USer not found", status: :unprocessable_entity
+    end
+  end
+
+  def admin_login
+    @user = User.find_by(username: params[:username], usertype: 'A').authenticate(params[:password])
+
+    if @user
+      render json: Admin.find_by(user:@user).passcode, status: :ok
     else
       render json:  "USer not found", status: :unprocessable_entity
     end

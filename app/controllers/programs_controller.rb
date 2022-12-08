@@ -14,9 +14,30 @@ class ProgramsController < ApplicationController
     render json: @programs
   end
 
+  def get_program_insights
+    @program = Program.find(params[:id])
+    render json: @program,only:[:title, :team_size, :is_open, :datetime], include:{teams:{include: [ participants:{only: :user, include: {user: {only: [], include:{user_detail:{only:[:firstname, :lastname,:phone1, :email]}}}}}], only:[:name, :id, :data] }
+    }
+  end
+
   def teamsize
     @program = Program.find_by(params[:id])
       render json: @program.team_size
+  end
+
+  def toggle
+    @user = User.find_by_username(params[:username]).authenticate(params[:password])
+    if @user
+      @program = Program.find_by(params[:id])
+      is_open = @program.is_open
+      @program.update(is_open: !@program.is_open)
+      if is_open !=@program.is_open
+        render json: @program.is_open
+      end
+    else
+      render json: "Noo"
+    end
+
   end
 
   # POST /programs

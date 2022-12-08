@@ -1,3 +1,4 @@
+require 'csv'
 class TeamParticipantsController < ApplicationController
   before_action :set_team_participant, only: %i[ show update destroy ]
 
@@ -22,6 +23,19 @@ class TeamParticipantsController < ApplicationController
     else
       render json: @team_participant.errors, status: :unprocessable_entity
     end
+  end
+
+
+  def export
+    @team_participants = TeamParticipant.all
+    csv =  CSV.generate do |csv|
+      csv << ["id", "team_id","participant_id"]
+      @team_participants.each do |entry|
+        csv << [entry.id, entry.team_id, entry.participant_id]
+      end
+    end
+    print(csv)
+    # render @team_participants.to_csv, filename: "posts-#{DateTime.now.strftime("%d%m%Y%H%M")}.csv"
   end
 
   # PATCH/PUT /team_participants/1

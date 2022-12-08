@@ -5,5 +5,4 @@ class Team < ApplicationRecord
 
   has_many  :participants, through: :team_participants
 
-  has_one :problem_statement
 end

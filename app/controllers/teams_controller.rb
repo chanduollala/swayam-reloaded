@@ -17,12 +17,18 @@ class TeamsController < ApplicationController
     if User.find_by_username(participant[:email])
       @user=User.find_by_username(participant[:email])
       @user_detail = UserDetail.find_by(user: @user)
+      @participant = Participant.find_by(user:@user)
       @user_detail.update(
         firstname: participant[:first_name],
         lastname: participant[:last_name],
         phone1: participant[:phone],
         email: participant[:email],
       )
+      @participant.update(
+        year_of_passing: participant[:year_of_passing],
+        course: participant[:course],
+        stream: participant[:stream],
+        bio: "Hey! I'm participating in Swayam event")
     else
       @user = User.new(username: participant[:email],
                        password: @team.name + participant[:phone],
@@ -35,20 +41,18 @@ class TeamsController < ApplicationController
                                     user: @user
       )
       @user_detail.save
+      @participant = Participant.new(
+        year_of_passing: participant[:year_of_passing],
+        course: participant[:course],
+        stream: participant[:stream],
+        bio: "Hey! I'm participating in Swayam event",
+        user:@user)
+      @participant.save
     end
 
   end
 
 
-  def create_participant(participant)
-    @participant = Participant.new(player_name: participant[:first_name]+participant[:year_of_passing],
-      year_of_passing: participant[:year_of_passing],
-      course: participant[:course],
-      stream: participant[:stream],
-      bio: "Hey! I'm participating in Swayam event",
-                                   user:@user)
-    @participant.save
-  end
 
   # POST /teams
   def create
@@ -61,7 +65,6 @@ class TeamsController < ApplicationController
       print(participant)
 
       create_user(participant)
-      create_participant(participant)
 
       @tp = TeamParticipant.new(team: @team,
                                 participant: @participant)
